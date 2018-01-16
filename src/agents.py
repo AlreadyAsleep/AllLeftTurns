@@ -15,3 +15,4 @@ from src import maze
 class Agent:
 
     def __init__(self):
+        """Basic Constructor"""
