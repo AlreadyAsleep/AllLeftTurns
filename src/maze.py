@@ -26,6 +26,7 @@ class Maze:
     def __str__(self):
         return self.adjacency.__repr__()
 
+    # This is not finished
     def make_maze(self):
         """Populates the maze with obstacles"""
         self.adjacency[0][random.randint(0, self.size - 1)] = 1  # creates the entry to the maze
@@ -34,5 +35,25 @@ class Maze:
             for j in range(self.size - 1):
                 self.adjacency[i][j] = random.randint(0, 100) % 2  # will place a zero if even and a one if not
 
-
+# Files to generate mazes from should be of the form:
+# | data |
+# | data |
+# | data |
+#   ...
+# length
+#
+# see the maze files in "../maze_files/ for examples
+def gen_from_maze_file(file):
+    data = open(file, "r")
+    lines = data.readlines()
+    m = Maze(int(lines[len(lines) - 1]))
+    count = 0
+    for line in lines:
+        if len(line) == 1:
+            break
+        current = line.split(" ")
+        current = [int(i) for i in current]
+        m.adjacency[count] = current
+        count += 1
+    return m
 
