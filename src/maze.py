@@ -21,7 +21,6 @@ import random
 
 
 class Maze:
-
     adjacency = [[]]
     size = 0
 
@@ -33,14 +32,39 @@ class Maze:
     def __str__(self):
         return self.adjacency.__repr__()
 
+        # Helper method for make_maze()
+
+    def is_1_adjacent(self, i, j):
+        if self.adjacency[i + 1][j] == 1 or self.adjacency[i - 1][j] == 1 or self.adjacency[i][j + 1] == 1 or \
+                self.adjacency[i][j - 1] == 1:
+            return True
+        return False
+
     # This is not finished
     def make_maze(self):
         """Populates the maze with obstacles"""
         self.adjacency[0][random.randint(0, self.size - 1)] = 1  # creates the entry to the maze
-        self.adjacency[self.size - 1][random.randint(0, self.size - 1)] = 1  # creates an exit to the maze
+        self.adjacency[self.size - 1][random.randint(0, self.size - 2)] = 1  # creates an exit to the maze
         for i in range(1, self.size - 2):
-            for j in range(self.size - 1):
+            for j in range(1, self.size - 2):
                 self.adjacency[i][j] = random.randint(0, 100) % 2  # will place a zero if even and a one if not
+                if self.adjacency[i][j] == 1:
+                    if not self.is_1_adjacent(i, j):
+                        temp_int = random.randint(1, 5)
+                        if temp_int == 1 and i < self.size - 2:  # open path to the right
+                            self.adjacency[i + 1][j] = 1
+                        elif temp_int == 2 and i > 1:            # open path to the left
+                            self.adjacency[i - 1][j] = 1
+                        elif temp_int == 3 and j < self.size - 2:  # open path above
+                            self.adjacency[i][j + 1] = 1
+                        elif j > 2:                              # open path below
+                            self.adjacency[i][j - 1] = 1
+
+    def is_path(self):
+        """Ensures the maze is solvable"""
+
+
+
 
 # Files to generate mazes from should be of the form:
 # | data |
@@ -63,4 +87,3 @@ def gen_from_maze_file(file):
         m.adjacency[count] = current
         count += 1
     return m
-
