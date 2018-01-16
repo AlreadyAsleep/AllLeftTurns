@@ -5,8 +5,6 @@
 #
 # This file holds the class for the environment, called "Maze"
 # It will hold a size variable and an adjacency matrix which will define walls, entrances, etc.
-# It will have the ability to create a random Maze on its own or
-#   read in a *.maze file and generate a maze from that
 #
 # Rules for mazes:
 # - There should be one entrance located on the first row
@@ -17,7 +15,6 @@
 
 
 import numpy
-import random
 
 
 class Maze:
@@ -31,49 +28,6 @@ class Maze:
 
     def __str__(self):
         return self.adjacency.__repr__()
-
-        # Helper method for make_maze()
-
-    def is_1_adjacent(self, i, j):
-        if self.adjacency[i + 1][j] == 1 or self.adjacency[i - 1][j] == 1 or self.adjacency[i][j + 1] == 1 or \
-                self.adjacency[i][j - 1] == 1:
-            return True
-        return False
-
-    # This is not finished
-    def make_maze(self):
-        """Populates the maze with obstacles"""
-        self.adjacency[0][random.randint(0, self.size - 2)] = 1  # creates the entry to the maze
-        self.adjacency[self.size - 1][random.randint(0, self.size - 2)] = 1  # creates an exit to the maze
-        for i in range(1, self.size - 2):
-            for j in range(1, self.size - 2):
-                self.adjacency[i][j] = random.randint(0, 100) % 2  # will place a zero if even and a one if not
-                if self.adjacency[i][j] == 1:
-                    if not self.is_1_adjacent(i, j):
-                        temp_int = random.randint(1, 5)
-                        self.seed_path(temp_int, i, j)
-        self.make_path()
-
-    def seed_path(self, rand, i, j):
-        if rand == 1 and i < self.size - 2:  # open path to the right
-            self.adjacency[i + 1][j] = 1
-        elif rand == 2 and i > 1:  # open path to the left
-            self.adjacency[i - 1][j] = 1
-        elif rand == 3 and j < self.size - 2:  # open path above
-            self.adjacency[i][j + 1] = 1
-        elif j > 2:  # open path below
-            self.adjacency[i][j - 1] = 1
-
-    def make_path(self):
-        """Ensures the maze is solvable"""
-        for i in range(len(self.adjacency)):
-            if 1 in self.adjacency[i]:
-                continue
-            temp_int = random.randint(1, self.size - 2)
-            self.adjacency[i][temp_int] = 1
-            if not self.is_1_adjacent(i, temp_int):
-                temp_int2 = random.randint(1, 5)
-                self.seed_path(temp_int2, i, temp_int)
 
 
 # Files to generate mazes from should be of the form:
