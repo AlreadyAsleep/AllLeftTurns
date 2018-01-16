@@ -10,9 +10,20 @@
 #
 
 
-from src import maze
-
 class Agent:
 
     def __init__(self):
         """Basic Constructor"""
+        pass
+
+    def __str__(self):
+        """String Representation"""
+        pass
+
+    def move(self, direction):
+        """Advance the agent in a direction """
+        pass
+
+    def perceive(self, directions):
+        """Perceive the environment"""
+        pass
