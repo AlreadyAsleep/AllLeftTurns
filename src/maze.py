@@ -7,6 +7,13 @@
 # It will hold a size variable and an adjacency matrix which will define walls, entrances, etc.
 # It will have the ability to create a random Maze on its own or
 #   read in a *.maze file and generate a maze from that
+#
+# Rules for mazes:
+# - There should be one entrance located on the first row
+# - There should be one exit located on the last row
+# - The left-most and right-most columns should be all zeroes to indicate walls
+# *see example files in "../maze_files/"
+#
 
 
 import numpy
