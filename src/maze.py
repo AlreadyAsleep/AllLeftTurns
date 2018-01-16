@@ -1,6 +1,6 @@
 # File: maze.py
 # Author: Ben Heil
-# Version 1.0
+# Version 1.1
 # Since: 1/15/18
 #
 # This file holds the class for the environment, called "Maze"
