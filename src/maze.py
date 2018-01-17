@@ -27,7 +27,7 @@ class Maze:
         self.adjacency = numpy.zeros((size, size))
 
     def __str__(self):
-        return self.adjacency.__repr__()
+        return "Maze: \n" + self.adjacency.__repr__()
 
 
 # Files to generate mazes from should be of the form:
