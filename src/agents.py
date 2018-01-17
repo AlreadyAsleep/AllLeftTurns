@@ -27,7 +27,7 @@ class Agent:
         """Advance the agent in a direction """
         pass
 
-    def perceive(self, directions, x, y):
+    def perceive(self, directions):
         """Perceive the environment"""
         pass
 
@@ -40,6 +40,9 @@ class AllLeft(Agent):
     location = (0, 0)
     end = 0
     active = False
+    front = False
+    left  = False
+    right = False
 
     # inherited methods
     def __init__(self, maze):
@@ -50,22 +53,94 @@ class AllLeft(Agent):
                 self.location = (0, i)
         self.end = maze.size
         self.active = True
+        self.front = True
 
     def __str__(self):
         return "\nAllLeft Agent:\nSteps taken: " + str(self.steps) + "\nCurrent Direction: " + self.direction + \
                "\nLocation: " + str(self.location)
 
     def move(self, direction):
-        pass
+        if direction == "forward":
+            if self.direction == "down":
+                self.location[0] += 1
+            elif self.direciton == "left":
+                self.location[1] -= 1
+            elif self.direction == "right":
+                self.location[1] += 1
+            else:
+                self.location[0] -= 1
+        if direction == "leftward":
+            if self.direction == "down":
+                self.location[1] += 1
+            elif self.direciton == "left":
+                self.location[1] -= 1
+            elif self.direction == "right":
+                self.location[1] += 1
+            else:
+                self.location[0] -= 1
 
-    def perceive(self, directions, x, y):
+    def perceive(self, directions):
         if self.location[0] == self.end:
-            pass
+            self.active = False
         elif self.direction == "down":
-            pass
+            if directions[self.location[0] + 1][self.location[1]] == 1:
+                front = True
+            else:
+                front = False
+            if directions[self.location[0]][self.location[1] + 1] == 1:
+                left = True
+            else:
+                left = False
+            if directions[self.location[0]][self.location[1] - 1] == 1:
+                right = True
+            else:
+                right = False
         elif self.direction == "left":
-            pass
+            if directions[self.location[0]][self.location[1] - 1] == 1:
+                front = True
+            else:
+                front = False
+            if directions[self.location[0] + 1][self.location[1]] == 1:
+                left = True
+            else:
+                left = False
+            if directions[self.location[0] - 1][self.location[1]] == 1:
+                right = True
+            else:
+                right = False
         elif self.direction == "right":
-            pass
+            if directions[self.location[0]][self.location[1] + 1] == 1:
+                front = True
+            else:
+                front = False
+            if directions[self.location[0] - 1][self.location[1]] == 1:
+                left = True
+            else:
+                left = False
+            if directions[self.location[0] + 1][self.location[1] - 1] == 1:
+                right = True
+            else:
+                right = False
         elif self.direction == "up":
-            pass
+            if directions[self.location[0] - 1][self.location[1]] == 1:
+                front = True
+            else:
+                front = False
+            if directions[self.location[0]][self.location[1] - 1] == 1:
+                left = True
+            else:
+                left = False
+            if directions[self.location[0]][self.location[1] + 1] == 1:
+                right = True
+            else:
+                right = False
+
+    def think(self):
+        if self.front:
+            self.move("forward")
+        elif self.left:
+            self.move("leftward")
+        elif self.right:
+            self.move("rightward")
+        else:
+            self.move("turn around")
