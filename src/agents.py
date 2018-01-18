@@ -3,6 +3,8 @@
 # Version 1.0
 # Since: 1/16/18
 #
+# ==================================================================================================================
+#
 # This file will contain 3 distinct maze-solving agents that will inherit from the general 'Agent' class:
 # - The first will be the 'AllLeft' agent:
 #       * No memory
@@ -13,10 +15,16 @@
 #
 # - The second will be the 'LeftOrRight' agent
 #       * Memory of the percentage chance that a move gets closer to the goal
-#       *
-# - The third will be the 'AStar' agent
+#       * Algorithm will initially not favor one direction at each junction, but change percentages based off
+#               previous point
+#       * Same sensors as 'AllLeft' agent but added sensor for Euclidean distance from goal
+#       * The win condition is identical to the 'AllLeft' agent
 #
-
+# - The third will be the 'AStar' agent
+#       *
+#
+# ==================================================================================================================
+#
 
 class Agent:
 
@@ -36,9 +44,19 @@ class Agent:
         """Perceive the environment"""
         pass
 
+    def think(self):
+        """Decide how to proceed"""
+        pass
 
+    def run(self, maze):
+        """Navigate through the maze"""
+        pass
+
+
+#  Class AllLeft Agent
+# ==================================================================================================================
+#
 class AllLeft(Agent):
-
     # sensors
     direction = ""
     steps = 0
@@ -61,7 +79,7 @@ class AllLeft(Agent):
         self.front = True
 
     def __str__(self):
-        return "\nAllLeft Agent:\nSteps taken: " + str(self.steps) + "\nCurrent Direction: " + self.direction + \
+        return "\nAllLeft Agent: \nSteps taken: " + str(self.steps) + "\nCurrent Direction: " + self.direction + \
                "\nLocation: " + str(self.location)
 
     def move(self, direction):
@@ -168,7 +186,6 @@ class AllLeft(Agent):
                 self.right = False
 
     def think(self):
-
         if self.left:
             self.move("leftward")
         elif self.front:
@@ -183,3 +200,81 @@ class AllLeft(Agent):
             print(self)
             self.perceive(maze.adjacency)
             self.think()
+
+
+#  Class LeftOrRight Agent
+# ==================================================================================================================
+#
+
+class LeftOrRight(AllLeft):
+    distance_from_goal = 0
+    run_counter = 0
+    chances = {"leftward": 100, "rightward": 100, "forward": 100}
+    boolean_mapping = {"leftward": False, "rightward": False, "forward": False}
+    learning_rate = .01
+    goal_location = []
+    start_location = []
+
+    def __init__(self, maze):
+        super().__init__(maze)
+        for i in range(len(maze.adjacency[maze.size - 1])):
+            if maze.adjacency[maze.size - 1][i] == 1:
+                self.goal_location = [maze.size - 1, i]
+        self.start_location = self.location.copy()
+
+    def __str__(self):
+        return "LeftOrRight agent: \nRun: " + str(self.run_counter) + "\nSteps: " + str(self.steps) \
+               + "\nCurrent Chances: " + str(self.chances) + "\n"
+
+    def think(self):
+        # Find direction with the highest chance
+        high = max(self.chances, key=lambda key: self.chances[key])
+        low = min(self.chances, key=lambda key: self.chances[key])
+        mid = ""
+        for key in self.chances:
+            if key != high and key != low:
+                mid = key
+
+        # see which directions are viable
+        self.boolean_mapping["leftward"] = self.left
+        self.boolean_mapping["rightward"] = self.right
+        self.boolean_mapping["forward"] = self.front
+
+        # move with priority given to the highest chanced move
+        flag = ""
+        if self.boolean_mapping[high]:
+            self.move(high)
+            flag = high
+        elif self.boolean_mapping[mid]:
+            self.move(mid)
+            flag = mid
+        elif self.boolean_mapping[low]:
+            self.move(low)
+            flag = low
+        else:
+            self.move("turn around")
+
+        # if that move brings us closer to the goal, increase that directions chance, and decrease others
+        temp = self.distance_from_goal
+        self.distance_from_goal = abs(self.location[0] - self.goal_location[0]) + \
+                                  abs(self.location[1] - self.goal_location[1])
+        if temp < self.distance_from_goal:
+            self.chances[flag] -= self.learning_rate
+        elif temp > self.distance_from_goal:
+            self.chances[flag] += self.learning_rate
+        else:
+            pass
+        for key in self.chances:
+            if key != flag:
+                self.chances[key] -= self.learning_rate
+
+    def run(self, maze, amt):
+        for i in range(amt):
+            self.run_counter += 1
+            while self.active:
+                self.perceive(maze.adjacency)
+                self.think()
+            print(self)
+            self.active = True
+            self.location = self.start_location.copy()
+            self.steps = 1
