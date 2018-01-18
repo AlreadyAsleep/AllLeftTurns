@@ -112,13 +112,13 @@ class AllLeft(Agent):
                 self.direction = "left"
             elif self.direction == "left":
                 self.location[0] -= 1
-                self.direction + "up"
+                self.direction = "up"
             elif self.direction == "right":
                 self.location[0] += 1
                 self.direction = "down"
             else:
                 self.location[1] += 1
-                self.direction = "up"
+                self.direction = "right"
         else:  # turn around
             if self.direction == "down":
                 self.direction = "up"
@@ -197,9 +197,10 @@ class AllLeft(Agent):
 
     def run(self, maze):
         while self.active:
-            print(self)
             self.perceive(maze.adjacency)
-            self.think()
+            if self.active:
+                self.think()
+        print(self)
 
 
 #  Class LeftOrRight Agent
@@ -209,9 +210,9 @@ class AllLeft(Agent):
 class LeftOrRight(AllLeft):
     distance_from_goal = 0
     run_counter = 0
-    chances = {"leftward": 100, "rightward": 100, "forward": 100}
-    boolean_mapping = {"leftward": False, "rightward": False, "forward": False}
-    learning_rate = .01
+    chances = {"leftward": 50, "rightward": 50}
+    boolean_mapping = {"leftward": False, "rightward": False}
+    learning_rate = .1
     goal_location = []
     start_location = []
 
@@ -230,24 +231,18 @@ class LeftOrRight(AllLeft):
         # Find direction with the highest chance
         high = max(self.chances, key=lambda key: self.chances[key])
         low = min(self.chances, key=lambda key: self.chances[key])
-        mid = ""
-        for key in self.chances:
-            if key != high and key != low:
-                mid = key
 
         # see which directions are viable
         self.boolean_mapping["leftward"] = self.left
         self.boolean_mapping["rightward"] = self.right
-        self.boolean_mapping["forward"] = self.front
 
         # move with priority given to the highest chanced move
         flag = ""
         if self.boolean_mapping[high]:
             self.move(high)
             flag = high
-        elif self.boolean_mapping[mid]:
-            self.move(mid)
-            flag = mid
+        elif self.front:
+            self.move("forward")
         elif self.boolean_mapping[low]:
             self.move(low)
             flag = low
@@ -257,16 +252,30 @@ class LeftOrRight(AllLeft):
         # if that move brings us closer to the goal, increase that directions chance, and decrease others
         temp = self.distance_from_goal
         self.distance_from_goal = abs(self.location[0] - self.goal_location[0]) + \
-                                  abs(self.location[1] - self.goal_location[1])
-        if temp < self.distance_from_goal:
-            self.chances[flag] -= self.learning_rate
-        elif temp > self.distance_from_goal:
-            self.chances[flag] += self.learning_rate
-        else:
+            abs(self.location[1] - self.goal_location[1])
+
+        if flag == "":
             pass
+        else:
+            if temp <= self.distance_from_goal:
+                self.chances[flag] -= self.learning_rate
+                for key in self.chances:
+                    if key != flag:
+                        self.chances[key] += self.learning_rate
+            else:
+                self.chances[flag] += self.learning_rate
+                for key in self.chances:
+                    if key != flag:
+                        self.chances[key] -= self.learning_rate
+
+        # Normalize chance values
         for key in self.chances:
-            if key != flag:
-                self.chances[key] -= self.learning_rate
+            if self.chances[key] > 100:
+                self.chances[key] = 100
+            elif self.chances[key] < 0:
+                self.chances[key] = 0
+
+
 
     def run(self, maze, amt):
         for i in range(amt):
@@ -274,6 +283,9 @@ class LeftOrRight(AllLeft):
             while self.active:
                 self.perceive(maze.adjacency)
                 self.think()
+                if self.location[0] == self.goal_location[0] and \
+                        self.location[1] == self.goal_location[1]:
+                    self.active = False
             print(self)
             self.active = True
             self.location = self.start_location.copy()
