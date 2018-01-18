@@ -35,7 +35,8 @@ class Maze:
 # | data |
 # | data |
 #   ...
-# length
+# 'size\n'
+# size
 #
 # see the maze files in "../maze_files/" for examples
 def gen_from_maze_file(file):
@@ -44,7 +45,7 @@ def gen_from_maze_file(file):
     m = Maze(int(lines[len(lines) - 1]))
     count = 0
     for line in lines:
-        if len(line) == 1:
+        if line == "size\n":
             break
         current = line.split(" ")
         current = [int(i) for i in current]
