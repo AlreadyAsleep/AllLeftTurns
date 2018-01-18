@@ -6,10 +6,15 @@
 # This file will contain 3 distinct maze-solving agents that will inherit from the general 'Agent' class:
 # - The first will be the 'AllLeft' agent:
 #       * No memory
-#       * Algorithm goes straight when it can, turns left when forced to turn, and turns around otherwise
+#       * Algorithm goes left when it can, prioritizes going straight over right turns, and turns around otherwise
 #       * A sensor for direction, the amount of steps taken and x,y position
-#       * The win condition for the agent is when its x coordinate is equal to the size of the maze
+#       * The win condition for the agent is when its x coordinate is equal to the size of the maze minus 1
 #           i.e. it is in the last row, so it must be the end
+#
+# - The second will be the 'LeftOrRight' agent
+#       * Memory of the percentage chance that a move gets closer to the goal
+#       *
+# - The third will be the 'AStar' agent
 #
 
 
@@ -163,10 +168,11 @@ class AllLeft(Agent):
                 self.right = False
 
     def think(self):
-        if self.front:
-            self.move("forward")
-        elif self.left:
+
+        if self.left:
             self.move("leftward")
+        elif self.front:
+            self.move("forward")
         elif self.right:
             self.move("rightward")
         else:
