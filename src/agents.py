@@ -5,7 +5,7 @@
 #
 # ==================================================================================================================
 #
-# This file will contain 3 distinct maze-solving agents that will inherit from the general 'Agent' class:
+# This file will contain distinct maze-solving agents that will inherit from the general 'Agent' class:
 # - The first will be the 'AllLeft' agent:
 #       * No memory
 #       * Algorithm goes left when it can, prioritizes going straight over right turns, and turns around otherwise
@@ -212,7 +212,7 @@ class LeftOrRight(AllLeft):
     run_counter = 0
     chances = {"leftward": 50, "rightward": 50}
     boolean_mapping = {"leftward": False, "rightward": False}
-    learning_rate = .1
+    learning_rate = 1
     goal_location = []
     start_location = []
 
@@ -257,16 +257,17 @@ class LeftOrRight(AllLeft):
         if flag == "":
             pass
         else:
+            multiplier = abs(temp - self.distance_from_goal)
             if temp <= self.distance_from_goal:
-                self.chances[flag] -= self.learning_rate
+                self.chances[flag] -= self.learning_rate * multiplier
                 for key in self.chances:
                     if key != flag:
-                        self.chances[key] += self.learning_rate
+                        self.chances[key] += self.learning_rate * multiplier
             else:
-                self.chances[flag] += self.learning_rate
+                self.chances[flag] += self.learning_rate * multiplier
                 for key in self.chances:
                     if key != flag:
-                        self.chances[key] -= self.learning_rate
+                        self.chances[key] -= self.learning_rate * multiplier
 
         # Normalize chance values
         for key in self.chances:
@@ -281,6 +282,7 @@ class LeftOrRight(AllLeft):
         for i in range(amt):
             self.run_counter += 1
             while self.active:
+                print(self)
                 self.perceive(maze.adjacency)
                 self.think()
                 if self.location[0] == self.goal_location[0] and \
