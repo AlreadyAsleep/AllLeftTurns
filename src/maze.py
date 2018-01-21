@@ -29,7 +29,13 @@ class Maze:
     def __str__(self):
         return "Maze: \n" + self.adjacency.__repr__()
 
-
+    def build_from_random(self, size):
+        if size % 2 != 0:
+            size +=1
+        m = Maze(size)
+        m.adjacency = maze_generator(size, size, 1, 1)
+        m.size = size + 1
+        return m
 # Files to generate mazes from should be of the form:
 # | data |
 # | data |
