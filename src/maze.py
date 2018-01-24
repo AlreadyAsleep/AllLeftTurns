@@ -103,8 +103,16 @@ def maze_generator(width=81, height=51, complexity=.75, density=.75):
             elif Z[i][j] == 0:
                 Z[i][j] = 1
 
-    # Add entrance
+    # Ensure second to last row doesn't cause loop
     ones = []
+    for num in range(len(Z[height - 1])):
+        if Z[height - 1][num] == 1:
+            ones.append(num)
+    if len(ones) < 3:
+        Z[height - 1][rand(2, width - 2)] = 1
+
+    # Add entrance
+    ones.clear()
     for num in range(len(Z[1])):
         if Z[1][num] == 1:
             ones.append(num)

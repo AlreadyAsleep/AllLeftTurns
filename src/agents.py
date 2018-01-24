@@ -282,7 +282,6 @@ class LeftOrRight(AllLeft):
         for i in range(amt):
             self.run_counter += 1
             while self.active:
-                print(self)
                 self.perceive(maze.adjacency)
                 self.think()
                 if self.location[0] == self.goal_location[0] and \
